@@ -1,5 +1,10 @@
 # 🤖 PersonalProgressAI (PPAI)
 
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![n8n](https://img.shields.io/badge/built%20with-n8n-FF6D5A.svg)
+![AI](https://img.shields.io/badge/powered%20by-AI-brightgreen.svg)
+![Telegram](https://img.shields.io/badge/interface-Telegram-26A5E4.svg)
+
 A comprehensive personal progress tracking system built with n8n that uses AI to monitor daily habits, physical measurements, and provides intelligent chat-based interaction through Telegram.
 
 ![General Workflow Overview](Public/general_look.png)
