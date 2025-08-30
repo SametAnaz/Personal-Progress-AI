@@ -1,0 +1,2435 @@
+{
+  "name": "PersonalProgressAI-<your_token>",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "<your_token>",
+              "name": "message.chat.first_name",
+              "value": "={{ $json.message.chat.first_name }}",
+              "type": "string"
+            },
+            {
+              "id": "<your_token>",
+              "name": "message.date",
+              "value": "={{ $json.message.date }}",
+              "type": "number"
+            },
+            {
+              "id": "<your_token>",
+              "name": "message.text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -336,
+        -272
+      ],
+      "id": "<your_token>",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}\nAnalyze this message received from a user. There are three possible formats for interpretation:\n\n---\n\n🟩 Format 1:\nIf the message starts with -msg (case-sensitive), regardless of the rest of the message content, it is considered to be a chat instruction.\n⚠️ In this case, the keyword -msg must be removed from the \"message\" field.\n\n👉 Set:\n\n\"navigate\": 0,\n\"message\": [the text after \"-chat\", trimmed]\n\n🟥 Format 2: Raw Chat Instruction\nIf the message starts with -chat (case-sensitive), regardless of the rest of the message content, it is considered to be a chat instruction.\n⚠️ In this case, the keyword -chat must be removed from the \"message\" field.\n\n👉 Set:\n\n\"navigate\": 1,\n\"message\": [the text after \"-chat\", trimmed]\n\n🟦 Format 3: Metric-based Summary Request\nIf the message starts with -msr (case-sensitive), regardless of the rest of the message content, it is considered to be a metric summary request.\n⚠️ In this case, the keyword -msr must be removed from the \"message\" field.\n\n👉 Set:\n\n\"navigate\": 2,\n\"message\": [the text after \"-msr\", trimmed]\n\n🎯 Return a single valid JSON object in the following format:\n\n{\n  \"message\": \"[cleaned message without prefix]\",\n  \"navigate\": 0 or 1 or 2\n}\n\n⚠️ Only return valid JSON. Do not include any explanation, tag, prefix, or commentary. Do not include \"-chat\" or \"-msr\" in the \"message\" field.\n\n---\n\n## 🔍 Örnek Beklenen Çıktılar\n\n### Input:\n-msr 75,180,80,175,90,110,95,note\n\n### Output:\n```json\n{\n  \"message\": \"75,180,80,175,90,110,95,note\",\n  \"navigate\": 2\n}\n\nInput:\n\n-chat Please summarize this week's activity.\nOutput:\n\n{\n  \"message\": \"Please summarize this week's activity.\",\n  \"navigate\": 1\n}",
+        "needsFallback": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -112,
+        -272
+      ],
+      "id": "<your_token>",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -96
+      ],
+      "id": "<your_token>",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "<your_token>",
+          "name": "gemini-api-<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -496,
+        112
+      ],
+      "id": "<your_token>",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        32,
+        112
+      ],
+      "id": "<your_token>",
+      "name": "Send a text message",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Daily Reminder\n",
+        "height": 384,
+        "width": 912,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -656,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# habit_log\n## Daily Routine\n### Insert data into habit_log db table",
+        "height": 368,
+        "width": 1568,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        -736
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# physique_log\n## Weekle Routine\n### Insert data into physique_log db table  ",
+        "height": 368,
+        "width": 1568,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "<your_token>",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": {},
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1648,
+        -672
+      ],
+      "id": "<your_token>",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "Degerler database e kaydedilemedi. ⛔",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1920,
+        -528
+      ],
+      "id": "<your_token>",
+      "name": "fail msg",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Rastgele komik bir konusma tarzi ile su sorulari sor:\n1-Bugun ders calistin mi?\n2-Bugun proje uzerinde calistin mi?\n3-Bugun spor yaptin mi?\n4-Bugun sosyal aktivite yaptin mi?\n5-Eklemek istedigin bir not varmi?\n\nKurallar:\n-Cok uzatmadan kisa cumleler kur.\n-Sorular anlasilabilir ama komik sekilde olsun. Her soru icin yalnizca bir cumle kur cumleler maksimum 10 kelime.\n-Gereksiz seyler soyleme sadece istedigim ciktiyi istedigim sekilde ver.\n-Butun sorulardan sonra 2 satir bosluk koy ve hep statik olarak yeni satirda sunu yaz \"Format : -msg [study] , [spor] , [social] , [note] \"",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        112
+      ],
+      "id": "<your_token>",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        304
+      ],
+      "id": "<your_token>",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "<your_token>",
+          "name": "gemini-api-<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.navigate }}",
+                    "rightValue": "0",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "<your_token>"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "goto habit_log"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "<your_token>",
+                    "leftValue": "={{ $json.navigate }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "chat_bot"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "<your_token>",
+                    "leftValue": "={{ $json.navigate }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "physique_log"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        416,
+        -288
+      ],
+      "id": "<your_token>",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. AI'den gelen kod bloğundaki JSON içeriği al\nconst raw = $json.output;\nconst cleanJson = raw.replace(/```json|```/g, '').trim();\n\nlet parsed;\ntry {\n  parsed = JSON.parse(cleanJson);\n} catch (e) {\n  throw new Error(\"JSON parse edilemedi: \" + e.message);\n}\n\n// 2. message'ı parçala\nconst parts = parsed.message.split(',');\n\nif (parts.length < 5) {\n  throw new Error(\"Beklenen 5 parça bulunamadı.\");\n}\n\n// 3. Değerleri ata\nconst [study, project, sport, social, ...noteParts] = parts;\nconst note = noteParts.join(','); // not kısmında virgül varsa korunsun\n\n// 4. Bugünün tarihini al\nconst today = new Date().toISOString().split('T')[0];\n\n// 5. Çıktıyı oluştur\nreturn [\n  {\n    json: {\n      study,\n      project,\n      sport,\n      social,\n      note,\n      date: today\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -672
+      ],
+      "id": "<your_token>",
+      "name": "Parser"
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "Degerler database e basariyla kaydedildi.✅ ",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1920,
+        -688
+      ],
+      "id": "<your_token>",
+      "name": "success msg",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "value": "<your_token>",
+          "mode": "list",
+          "cachedResultName": "<your_token>"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "study",
+              "value": "={{ $json.study }}"
+            },
+            {
+              "column": "project",
+              "value": "={{ $json.project }}"
+            },
+            {
+              "column": "sport",
+              "value": "={{ $json.sport }}"
+            },
+            {
+              "column": "social",
+              "value": "={{ $json.social }}"
+            },
+            {
+              "column": "note",
+              "value": "={{ $json.note }}"
+            },
+            {
+              "column": "date",
+              "value": "={{ $json.date }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        1392,
+        -672
+      ],
+      "id": "<your_token>",
+      "name": "isert to habit_log",
+      "credentials": {
+        "mySql": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "meta-llama/llama-3.1-405b-instruct:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -592
+      ],
+      "id": "<your_token>",
+      "name": "Free lama1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "<your_token>",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "\n\n#  Chatbot\n",
+        "height": 384,
+        "width": 1568,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        -352
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. AI'den gelen kod bloğundaki JSON içeriği al\nconst raw = $json.output;\nconst cleanJson = raw.replace(/```json|```/g, '').trim();\n\nlet parsed;\ntry {\n  parsed = JSON.parse(cleanJson);\n} catch (e) {\n  throw new Error(\"JSON parse edilemedi: \" + e.message);\n}\n\n// 2. message'ı parçala\nconst parts = parsed.message.split(',');\n\nif (parts.length < 5) {\n  throw new Error(\"Beklenen 5 parça bulunamadı.\");\n}\n\n// 3. Değerleri ata\nconst [weight,height, waist, neck, hip, shoulder, chest, ...noteParts] = parts;\nconst note = noteParts.join(','); // not kısmında virgül varsa korunsun\n\n// 4. Bugünün tarihini al\nconst today = new Date().toISOString().split('T')[0];\n\n// 5. Çıktıyı oluştur\nreturn [\n  {\n    json: {\n      weight,\n      height,\n      waist,\n      neck,\n      hip,\n      shoulder,\n      chest,\n      note,\n      date: today\n    }\n  }\n];\n                        "
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        112
+      ],
+      "id": "<your_token>",
+      "name": "Parser1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        -688
+      ],
+      "id": "<your_token>",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "={{ $json.output }}\n\nDogru format: -msr 75,80,175,90,110,95,not",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        -688
+      ],
+      "id": "<your_token>",
+      "name": "Send a text message1",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Weekly Reminder\n",
+        "height": 384,
+        "width": 912,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -656,
+        -752
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Rastgele komik bir konusma tarzi ile su sorulari sor:\n1-Kaç kilosun?\n2-Belin kaç cm?\n3-Boynun kaç cm?\n4-Kalçan kaç cm?\n5-Omuz genişliğin kaç cm?\n6-Göğüs genişliğin kaç cm?\n7-Eklemek istedigin bir not varmi?\n\nKurallar:\n-Cok uzatmadan kisa cumleler kur.\n-Sorular anlasilabilir ama komik sekilde olsun. Her soru icin yalnizca bir cumle kur cumleler maksimum 12 kelime.\n-Gereksiz seyler soyleme sadece istedigim ciktiyi istedigim sekilde ver.\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -272,
+        -688
+      ],
+      "id": "<your_token>",
+      "name": "AI Agent4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -512
+      ],
+      "id": "<your_token>",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "<your_token>",
+          "name": "gemini-api-<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Chat Listener & Router\n",
+        "height": 384,
+        "width": 1312,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -656,
+        -352
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "value": "<your_token>",
+          "mode": "list",
+          "cachedResultName": "<your_token>"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "weight",
+              "value": "={{ $json.weight }}"
+            },
+            {
+              "column": "waist",
+              "value": "={{ $json.waist }}"
+            },
+            {
+              "column": "neck",
+              "value": "={{ $json.neck }}"
+            },
+            {
+              "column": "hip",
+              "value": "={{ $json.hip }}"
+            },
+            {
+              "column": "shoulder",
+              "value": "={{ $json.shoulder }}"
+            },
+            {
+              "column": "chest",
+              "value": "={{ $json.chest }}"
+            },
+            {
+              "column": "note",
+              "value": "={{ $json.note }}"
+            },
+            {
+              "column": "date",
+              "value": "={{ $json.date }}"
+            },
+            {
+              "column": "height",
+              "value": "={{ $json.height }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        1360,
+        112
+      ],
+      "id": "<your_token>",
+      "name": "isert to physique_log",
+      "credentials": {
+        "mySql": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "<your_token>",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": {},
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1632,
+        112
+      ],
+      "id": "<your_token>",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "=⚠️ Mesaj formatı geçersiz.  \n✅ Doğru format: weight(kg),waist(cm),neck(cm),hip(cm),shoulder(cm),chest(cm),note(text)\n\nExample: -msr 0,0,0,0,0,0,note",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1904,
+        256
+      ],
+      "id": "<your_token>",
+      "name": "fail msg2",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "Degerler database e basariyla kaydedildi.✅ ",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1904,
+        96
+      ],
+      "id": "<your_token>",
+      "name": "success msg1",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM `<your_token>`\nORDER BY `created_at` DESC\nLIMIT 1;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        1824,
+        512
+      ],
+      "id": "<your_token>",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "mySql": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// input: [{ output: '```json\\n{...}\\n```' }]\nconst raw = $json.output;\n\n// 1. Kod bloğu içinden JSON stringi çıkar\nconst cleanJson = raw.replace(/```json|```/g, '').trim();\n\n// 2. JSON stringini nesne olarak parse et\nlet parsed;\ntry {\n  parsed = JSON.parse(cleanJson);\n} catch (e) {\n  throw new Error(\"JSON parse edilemedi: \" + e.message);\n}\n\n// 3. navigate değerini ayır\nconst navigate = String(parsed.navigate);\n\n// 4. \"navigate\" alanını JSON'dan çıkar\ndelete parsed.navigate;\n\n// 5. Kalan JSON'u tekrar stringify edip ```json bloğu haline getir\nconst modifiedOutput = '```json\\n' + JSON.stringify(parsed, null, 2) + '\\n```';\n\n// 6. Geri döndür\nreturn [\n  {\n    json: {\n      output: modifiedOutput,\n      navigate: navigate\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -272
+      ],
+      "id": "<your_token>",
+      "name": "Parser3"
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "=Haftalik Degerlendirme:   \n{{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3040,
+        480
+      ],
+      "id": "<your_token>",
+      "name": "Raport",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=vucut-kitle endeksi:{{ $json.bmi }}  \nvucut yag orani:%{{ $json.body_fat_pct }}\nkas kutlesi: {{ $json.muscle_mass }} kg\nvucut kutlesi:{{ $json.weight }} kg\nbu degerlere sahip bir kisiyi degerlendir. ortalama 50 (40-50) kelime kullan. \nSakaci,argolu komik bir tarzda yorumla. \n- Argo kullan.\n- Cok fazla ovme.\n- Yalakalik yapma.\n- En son cumlede argolu bir sekilde cesaretlendirici birseyler soyle",
+        "needsFallback": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2672,
+        496
+      ],
+      "id": "<your_token>",
+      "name": "AI Agent2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.item.json;\n\nfunction safeParse(val, name) {\n  const parsed = parseFloat(val);\n  if (isNaN(parsed)) {\n    throw new Error(`Hatalı ya da eksik giriş: ${name}`);\n  }\n  return parsed;\n}\n\nfunction log10(val) {\n  if (val <= 0) throw new Error(`log10 için geçersiz değer: ${val}`);\n  return Math.log(val) / Math.LN10;\n}\n\n// Giriş verileri (zorunlu)\nconst weight = safeParse(item.weight, \"weight\");\nconst height = safeParse(item.height, \"height\");\nconst waist = safeParse(item.waist, \"waist\");\nconst neck = safeParse(item.neck, \"neck\");\n\nlet bmi = +(weight / ((height / 100) ** 2)).toFixed(2);\n\n// Body Fat % (erkek varsayıyoruz)\nconst diff = waist - neck;\nif (diff <= 0) throw new Error(`waist - neck farkı pozitif olmalı (şu an ${diff})`);\nconst body_fat_pct = +(\n  495 / (1.0324 - 0.19077 * log10(diff) + 0.15456 * log10(height)) - 450\n).toFixed(2);\n\n// Muscle Mass (kg)\nconst muscle_mass = +((1 - body_fat_pct / 100) * weight * 0.8).toFixed(2);\n\n// Sonuçları döndür\nreturn {\n  json: {\n    ...item,\n    bmi,\n    body_fat_pct,\n    muscle_mass\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        512
+      ],
+      "id": "<your_token>",
+      "name": "Calculation"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n\nfunction safeParse(v) {\n  const parsed = parseFloat(v);\n  return isNaN(parsed) ? null : parsed;\n}\n\nconst item = items[0].json;\n\nconst weight = safeParse(item.weight);\nconst waist = safeParse(item.waist);\nconst neck = safeParse(item.neck);\nconst height = safeParse(item.height);\n\nlet bmi = null;\nlet bodyFatPct = null;\nlet muscleMass = null;\n\nif (weight && height) {\n  bmi = parseFloat((weight / ((height / 100) ** 2)).toFixed(2));\n}\n\nif (waist && neck && height) {\n  const logPart = Math.log10(waist - neck);\n  const logHeight = Math.log10(height);\n  bodyFatPct = parseFloat((495 / (1.0324 - 0.19077 * logPart + 0.15456 * logHeight) - 450).toFixed(2));\n}\n\nif (weight && bodyFatPct !== null) {\n  const leanBodyMass = weight * (1 - bodyFatPct / 100);\n  muscleMass = parseFloat((leanBodyMass * 0.75).toFixed(2));\n}\n\nreturn [\n  {\n    json: {\n      bmi: bmi !== null ? bmi : null,\n      body_fat_pct: bodyFatPct !== null ? bodyFatPct : null,\n      muscle_mass: muscleMass !== null ? muscleMass : null\n    }\n  }\n];\n$input.first().json.weight"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        512
+      ],
+      "id": "<your_token>",
+      "name": "Calculation1"
+    },
+    {
+      "parameters": {
+        "content": "## Free lama model\n",
+        "height": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        -704
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Weekly Sport Raport Generator",
+        "height": 368,
+        "width": 1520,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1712,
+        432
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1792,
+        -288
+      ],
+      "id": "<your_token>",
+      "name": "chat reply",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Sen bir chat botusun. Aşağıdaki mesaja cevap ver.\n\nKurallar:\n- senin adin: \"<your_token>\"\n-kendi adini sadece istenirse belirt.\n- Argo kullanılacak (ama küfür etme, sokak jargonu seviyesinde kalsın)\n- Cevap kısa ve net olacak (tweet gibi)\n- Esprili bir dil kullanılacak (laf sok, takıl ama kırıcı olma)\n- Gereksiz hiçbir şey yazma (saçmalama)\n- Sadece chat mesajına cevap ver (başka şey anlatma)\n- Eger formatin ne oldugu sorulursa soyle cevap ver;\n\"-msr 0,1,0,1,1,0,1,note        ===        weight(kg),height(cm),waist(cm),neck(cm),hip(cm),shoulder(cm),chest(cm),note(text)\n-msg 0,0,0,0,text     ===      study,project,sport,social,note, \"\n\n\n\n\n\n\n\n🧠 Elinde 3 tane veritabanı var. Aşağıdaki konularla ilgili bir soru geldiğinde ona göre doğru tablodan veriyi çekip cevap ver:\n\n---\n\n### 🟩 1. Tablo: `<your_token>`\n- Alanlar: `study`, `project`, `sport`, `social`, `note`\n- Günlük alışkanlıklarımı içeriyor. Bir şeyi yaptıysam 1, yapmadıysam 0.\n- Kullanıcı “bugün ders çalıştım mı”, “spor yaptım mı”, “sosyaldim mi” gibi şeyler sorarsa buradan bak.\n- En son kaydı çek (`created_at` veya `date` sıralamasıyla).\n\n---\n\n### 🟥 2. Tablo: `<your_token>`\n- Alanlar: `weight`, 'height', `waist`, `neck`, `hip`, `chest`, `shoulder`, `note`\n- Fiziksel ölçü verilerim. Günlük değişir.\n- Kullanıcı “kaç kiloyum”, “belim kaç cm”, “son ölçümüm ne” gibi bir şey sorarsa bu tabloyu kullan.\n\n---\n\n### 🟦 3. Tablo: <your_token> – Haftalık özet veriler.\n\nAlanlar: date, weight, height, bmi, muscle_mass, body_fat_pct, created_at\n-Bu haftalik raporlarin tutuldugu tablodur.\n- Kullanıcı “kas oranım ne”, “haftalık raporum ne diyor”, “yağ oranım düşük mü” gibi şeyler sorarsa buraya bak.\n- Haftalık özetleri içeriyor. En son satırı al.\n\n---\n\nSadece bu 3 veritabanını kullan. Uydurma, kafadan atma. Eğer veri yoksa laf sok ama eğlenceli şekilde. Örneğin:\n- `\"Veri yok kanka, sen kendini mi siliyorsun her hafta?\"`\n- `\"Kayıt göremedim, tartı mı bozuldu acaba?\"`\n\nYanıtlanacak mesaj: {{ $json.message }}",
+        "needsFallback": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1216,
+        -272
+      ],
+      "id": "<your_token>",
+      "name": "AI Agent1",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = items[0].json.output;\n\n// Kod bloğu içindeki JSON'u çıkar (```json ... ```)\nconst cleaned = raw.replace(/```json\\n?/, '').replace(/```/, '').trim();\n\nlet parsedMessage = null;\ntry {\n  const parsed = JSON.parse(cleaned);\n  parsedMessage = parsed.message || null;\n} catch (e) {\n  parsedMessage = null;\n}\n\nreturn [\n  {\n    json: {\n      message: parsedMessage\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        -272
+      ],
+      "id": "<your_token>",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        -96
+      ],
+      "id": "<your_token>",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "<your_token>",
+          "name": "gemini-api-<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        -272
+      ],
+      "id": "<your_token>",
+      "name": "Telegram Trigger",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "<your_token>",
+          "mode": "list",
+          "cachedResultName": "<your_token>"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySqlTool",
+      "typeVersion": 2.5,
+      "position": [
+        1456,
+        -96
+      ],
+      "id": "<your_token>",
+      "name": "physique_log",
+      "credentials": {
+        "mySql": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "<your_token>",
+          "mode": "list",
+          "cachedResultName": "<your_token>"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySqlTool",
+      "typeVersion": 2.5,
+      "position": [
+        1568,
+        -96
+      ],
+      "id": "<your_token>",
+      "name": "<your_token>",
+      "credentials": {
+        "mySql": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "<your_token>",
+          "mode": "list",
+          "cachedResultName": "<your_token>"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySqlTool",
+      "typeVersion": 2.5,
+      "position": [
+        1680,
+        -96
+      ],
+      "id": "<your_token>",
+      "name": "<your_token>",
+      "credentials": {
+        "mySql": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "=Ai Agent Error!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1968,
+        -144
+      ],
+      "id": "<your_token>",
+      "name": "fail msg1",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Log inspect and chat feedback",
+        "height": 368,
+        "width": 528,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1152,
+        432
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "1"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1312,
+        -96
+      ],
+      "id": "<your_token>",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2704,
+        688
+      ],
+      "id": "<your_token>",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "<your_token>",
+          "name": "gemini-api-<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "<your_token>",
+              "name": "weight",
+              "value": "={{ $json.weight }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2096,
+        656
+      ],
+      "id": "<your_token>",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2352,
+        528
+      ],
+      "id": "<your_token>",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "value": "<your_token>",
+          "mode": "list",
+          "cachedResultName": "<your_token>"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "weight",
+              "value": "={{ $('Edit Fields1').item.json.weight }}"
+            },
+            {
+              "column": "height",
+              "value": "={{ $('Execute a SQL query').item.json.height }}"
+            },
+            {
+              "column": "bmi",
+              "value": "={{ $json.bmi }}"
+            },
+            {
+              "column": "muscle_mass",
+              "value": "={{ $json.muscle_mass }}"
+            },
+            {
+              "column": "body_fat_pct",
+              "value": "={{ $json.body_fat_pct }}"
+            },
+            {
+              "column": "date",
+              "value": "={{ $('Execute a SQL query').item.json.date }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        2512,
+        656
+      ],
+      "id": "<your_token>",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "mySql": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "value": "<your_token>",
+          "mode": "list",
+          "cachedResultName": "<your_token>"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "weight",
+              "value": "={{ $('Parser1').item.json.weight }}"
+            },
+            {
+              "column": "height",
+              "value": "={{ $('Parser1').item.json.height }}"
+            },
+            {
+              "column": "bmi",
+              "value": "={{ $json.bmi }}"
+            },
+            {
+              "column": "muscle_mass",
+              "value": "={{ $json.muscle_mass }}"
+            },
+            {
+              "column": "body_fat_pct",
+              "value": "={{ $json.body_fat_pct }}"
+            },
+            {
+              "column": "date",
+              "value": "={{ $('Parser1').item.json.date }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        1424,
+        512
+      ],
+      "id": "<your_token>",
+      "name": "Insert rows in a table1",
+      "credentials": {
+        "mySql": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "=Ai Agent Error!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        -128
+      ],
+      "id": "<your_token>",
+      "name": "fail msg3",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3-70b-8192",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1216,
+        -96
+      ],
+      "id": "<your_token>",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "<your_token>",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3-70b-8192",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -96
+      ],
+      "id": "<your_token>",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "<your_token>",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "=Ai Agent Error!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3040,
+        640
+      ],
+      "id": "<your_token>",
+      "name": "fail msg4",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3-70b-8192",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        2800,
+        688
+      ],
+      "id": "<your_token>",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "<your_token>",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "<your_token>",
+          "mode": "list",
+          "cachedResultName": "<your_token>"
+        },
+        "limit": 20,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        3040,
+        272
+      ],
+      "id": "<your_token>",
+      "name": "Select rows from a table",
+      "credentials": {
+        "mySql": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(e => e.json);\n\n// Tarih sırasına göre sıralıyoruz (önlem amaçlı)\nrows.sort((a, b) => new Date(a.date) - new Date(b.date));\n\n// X ekseni: Tarihler\nconst labels = rows.map(r => r.date);\n\n// Y ekseni verileri: 4 ayrı metrik\nconst weights = rows.map(r => parseFloat(r.weight));\nconst bmis = rows.map(r => parseFloat(r.bmi));\nconst bodyFats = rows.map(r => parseFloat(r.body_fat_pct));\nconst muscles = rows.map(r => parseFloat(r.muscle_mass));\n\nreturn [{\n  json: {\n    chart: {\n      type: \"line\",\n      data: {\n        labels,\n        datasets: [\n          {\n            label: \"Weight (kg)\",\n            data: weights,\n            borderColor: \"blue\",\n            fill: false\n          },\n          {\n            label: \"BMI\",\n            data: bmis,\n            borderColor: \"green\",\n            fill: false\n          },\n          {\n            label: \"Body Fat (%)\",\n            data: bodyFats,\n            borderColor: \"red\",\n            fill: false\n          },\n          {\n            label: \"Muscle Mass (kg)\",\n            data: muscles,\n            borderColor: \"orange\",\n            fill: false\n          }\n        ]\n      },\n      options: {\n        plugins: {\n          title: {\n            display: true,\n            text: \"📊 Weekly Physique Metrics\"\n          }\n        },\n        scales: {\n          y: {\n            beginAtZero: false\n          }\n        }\n      }\n    }\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3248,
+        272
+      ],
+      "id": "<your_token>",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "url": "https://quickchart.io/chart",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "c",
+              "value": "={{ JSON.stringify($json.chart) }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3456,
+        272
+      ],
+      "id": "<your_token>",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "<your_token>",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "={{ $json.chart.options.plugins.title.text }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3664,
+        272
+      ],
+      "id": "<your_token>",
+      "name": "Send a photo message",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### Graphic raport",
+        "height": 224,
+        "width": 992,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2864,
+        208
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "=Hesaplamalar basarili bir sekilde database e kaydedildi.✅ ",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        512
+      ],
+      "id": "<your_token>",
+      "name": "succes msg2",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "<your_token>",
+          "mode": "list",
+          "cachedResultName": "<your_token>"
+        },
+        "additionalFields": {
+          "description": "Haftalik Ozet:",
+          "summary": "={{ $json.output }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        208
+      ],
+      "id": "<your_token>",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "<your_token>",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Google Calender Node Example\n",
+        "height": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        96
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 12
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        -1152
+      ],
+      "id": "<your_token>",
+      "name": "Schedule Trigger2"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "<your_token>",
+          "mode": "list",
+          "cachedResultName": "<your_token>"
+        },
+        "limit": 30,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        1136,
+        -1152
+      ],
+      "id": "<your_token>",
+      "name": "Select rows from a table1",
+      "credentials": {
+        "mySql": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(e => e.json);\n\n// Tarih sırasına göre sırala\nrows.sort((a, b) => new Date(a.date) - new Date(b.date));\n\nconst labels = rows.map(r => r.date);\nconst study = rows.map(r => Number(r.study));\nconst project = rows.map(r => Number(r.project));\nconst sport = rows.map(r => Number(r.sport));\nconst social = rows.map(r => Number(r.social));\n\nreturn [{\n  json: {\n    chart: {\n      type: \"line\",\n      data: {\n        labels,\n        datasets: [\n          { label: \"Study\", data: study, borderColor: \"blue\", fill: false },\n          { label: \"Project\", data: project, borderColor: \"green\", fill: false },\n          { label: \"Sport\", data: sport, borderColor: \"orange\", fill: false },\n          { label: \"Social\", data: social, borderColor: \"purple\", fill: false }\n        ]\n      },\n      options: {\n        plugins: {\n          title: {\n            display: true,\n            text: \"🗓️ Haftalık Alışkanlık Aktivitesi\"\n          }\n        },\n        scales: {\n          y: { beginAtZero: true, ticks: { stepSize: 1, max: 1 } }\n        }\n      }\n    }\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        -1152
+      ],
+      "id": "<your_token>",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "url": "https://quickchart.io/chart",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "c",
+              "value": "={{ JSON.stringify($json.chart) }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1648,
+        -928
+      ],
+      "id": "<your_token>",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "<your_token>",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "={{ $json.chart.options.plugins.title.text }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1904,
+        -928
+      ],
+      "id": "<your_token>",
+      "name": "Send a photo message1",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Aşağıda bir kullanıcının 7 güne ait alışkanlık verilerinden oluşan grafik datası var. Her gün `study`, `project`, `sport`, `social` alanlarında bir şeyler yapmış ya da yapmamış. (1 = yaptı, 0 = yapmadı)\n\nGrafik datası:\n{{ JSON.stringify($json.chart, null, 2) }}\n\nSen bu veriye bak ve kullanıcıya sanki kankana laf çakıyormuş gibi ama yapıcı bir şekilde yaz:\n\n- Geçen haftası nasıldı? Çok mu boşladı, bir gün çok mu kastı?\n- En çok neye vakit ayırmış, en az neyi yapmış?\n- Sonuçta ona kısa, samimi, motivasyonlu ama dürüst bir **tek cümlelik tavsiye** ver.\n\nDilin ciddi olmasın, argo-samimi konuş. Tatlı tatlı kafa aç.\n",
+        "needsFallback": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1632,
+        -1248
+      ],
+      "id": "<your_token>",
+      "name": "AI Agent5",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        -1072
+      ],
+      "id": "<your_token>",
+      "name": "Google Gemini Chat Model5",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "<your_token>",
+          "name": "gemini-api-<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        -1072
+      ],
+      "id": "<your_token>",
+      "name": "Groq Chat Model3",
+      "credentials": {
+        "groqApi": {
+          "id": "<your_token>",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "=Haftalik Degerlendirme:   \n{{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2000,
+        -1312
+      ],
+      "id": "<your_token>",
+      "name": "Raport1",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "<your_token>",
+        "text": "=Ai Agent Error!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2000,
+        -1152
+      ],
+      "id": "<your_token>",
+      "name": "fail msg5",
+      "webhookId": "<your_token>",
+      "credentials": {
+        "telegramApi": {
+          "id": "<your_token>",
+          "name": "<your_token>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "1"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1808,
+        -1072
+      ],
+      "id": "<your_token>",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "content": "## Weekly habit raport",
+        "height": 608,
+        "width": 1568,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        -1360
+      ],
+      "typeVersion": 1,
+      "id": "<your_token>",
+      "name": "Sticky Note11"
+    }
+  ],
+  "pinData": {
+    "AI Agent2": [
+      {
+        "json": {
+          "output": "Vücut Kitle Endeksi'ne göre hafiften bi' kilolusun diyorlar ama yalan! O kütlenin çoğu kas hacı, anlaşılan bayağı bi' demirle haşır neşir olmuşsun. Yağ oranı da fena değil, atletik bayağı. Helal lan, devam böyle çatır çatır parçalamaya!"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parser3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "fail msg3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "success msg",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "fail msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Parser",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parser1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parser": {
+      "main": [
+        [
+          {
+            "node": "isert to habit_log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "isert to habit_log": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Free lama1": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent4": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parser1": {
+      "main": [
+        [
+          {
+            "node": "isert to physique_log",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Calculation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "success msg1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "fail msg2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "isert to physique_log": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Calculation1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parser3": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Raport",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Select rows from a table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "fail msg4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "success msg1": {
+      "main": [
+        []
+      ]
+    },
+    "Calculation": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculation1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "chat reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "fail msg1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "physique_log": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "<your_token>": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "<your_token>": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        []
+      ]
+    },
+    "Insert rows in a table1": {
+      "main": [
+        [
+          {
+            "node": "succes msg2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Select rows from a table": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Raport": {
+      "main": [
+        []
+      ]
+    },
+    "succes msg2": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Select rows from a table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select rows from a table1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent5": {
+      "main": [
+        [
+          {
+            "node": "Raport1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "fail msg5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "<your_token>",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "<your_token>"
+  },
+  "id": "<your_token>",
+  "tags": []
+}
